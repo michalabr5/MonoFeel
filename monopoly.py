@@ -101,19 +101,51 @@ def onFeeling1(db_file):
         rows = cur.fetchall()
         feelingRow = random.choice(rows)
         feeling=feelingRow[1]
-        print(feeling)
-        button(feeling, 565, 565, 200, 40, darkblue, green)
+        display_surface = pygame.display.set_mode((200, 200))
+        text = font.render("feeling:    "+feeling, True, black, white)
+        textRect = text.get_rect()
+        textRect.center = (100, 100)
+        flag=True
+        while flag:
+            display_surface.fill(white)
+            display_surface.blit(text, textRect)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+                    # Draws the surface object to the screen.
+                pygame.display.update()
 
 
+def onMission1(db_file):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM MISSIONS")
+    rows = cur.fetchall()
+    missionRow = random.choice(rows)
+    mission = missionRow[1]
+    display_surface = pygame.display.set_mode((400, 400))
+    text = font.render("mission:    " + mission, True, black, white)
+    textRect = text.get_rect()
+    textRect.center = (200, 200)
+    flag = True
+    while flag:
+        display_surface.fill(white)
+        display_surface.blit(text, textRect)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
-
-
+                # Draws the surface object to the screen.
+            pygame.display.update()
 
 def amountp1():
     global x1
     global y1
     global initial_cost1
-    onFeeling1('NounsMissionsFeelings.db')
+    onMission1('NounsMissionsFeelings.db')
     """if (x1 < 341 and y1 < 610 and y1 > 500):
         initial_cost1 -= 0  # Start
     elif (x1 < 341 and y1 < 500 and y1 > 415):

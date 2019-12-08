@@ -22,6 +22,24 @@ c.execute('''CREATE TABLE IF NOT EXISTS MISSIONS
 
 conn.commit()
 
+conn1 = sqlite3.connect('Users.db')
+c = conn1.cursor()  # The database will be saved in the location where your 'py' file is saved
+
+# Create table - PLAYERS
+c.execute('''CREATE TABLE IF NOT EXISTS PLAYERS
+             ([Player_Name] text,[Player_Age] INTEGER)''')
+
+# Create table - ADMINS
+c.execute('''CREATE TABLE IF NOT EXISTS ADMINS
+             ([generated_id] INTEGER PRIMARY KEY,[Admin_Password] text)''')
+
+# Create table - GUIDERS
+c.execute('''CREATE TABLE IF NOT EXISTS GUIDERS
+             ([generated_id] INTEGER PRIMARY KEY,[Guider_Password] text)''')
+
+conn1.commit()
+
+
 
 pygame.init()  # pygame initialisation
 pygame.font.init()  # font initialisation

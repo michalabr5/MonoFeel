@@ -289,38 +289,23 @@ def game_controls():
         text_to_button("INSTRUCTIONS", blue, 630, 125, 50, 100)
         text_to_button2(
             "1. The game begins with player '1' rolling the dice. The marble moves the respective number of blocks ahead!",
-            black, 428, 220, 10, 10)
+            black, 628, 220, 10, 10)
         text_to_button2(
-            "2. Once on a block, the player must decide whether to buy the property or not(Provided that the given property is not already purchased).",
-            black, 495, 240, 10, 10)
+            "2. Once on a block, the player need to do what the block said - feeling, mission or drop a noun).",
+            black, 628, 250, 10, 10)
         text_to_button2(
-            "3. If a player lands on a property which is already purchased, the player has to pay an amount which is equal to one-fourth of the initial property rate, as a visiting rent to the munci",
-            black, 599, 260, 10, 10)
-        text_to_button2("-pality of the city", black, 206, 280, 10, 10)
-        text_to_button2("4. Player who finishes three laps of the game fastest, wins.", black, 305, 300, 10, 10)
+            "3. If a player lands on a feeling - he need to tell a story with 1 or 2 nouns that he has - that fit to the feeling",
+            black, 628, 280, 10, 10)
+        text_to_button2("4. Player who finishes all his nouns - wins.", black, 628, 310, 10, 10)
         text_to_button2(
-            "   5. If during the gameplay, a person falls short of money provided, this automatically results as awin-situation for another player.",
-            black, 467, 320, 10, 10)
+            "   5. if a player lands on a mission - he needs to do it - or take 2 more nouns.",
+            black, 628, 340, 10, 10)
         text_to_button2(
-            "  6. If a player lands on block of either of 'Chance' or 'Community Chest', the player has to follow the rules of them seperately.",
-            black, 456, 340, 10, 10)
+            "  6. if a player lands on drop a card - he can choose which noun he will drop .",
+            black, 628, 370, 10, 10)
         text_to_button2(
-            "7. Jail : Player who lands on the 'Jail' block skips one turn                                               ",
-            black, 368, 360, 10, 10)
-        text_to_button2("8. Free Ride : Player who lands on the 'Free Ride' block gets another turn.", black, 333, 380,
-                        10, 10)
-        text_to_button("Chance : ", blue, 70, 415, 10, 10)
-        text_to_button2(
-            "Chance is one of the two types of card-drawing spaces in Monopoly. If a player lands on a space marked for 'chance', Uncle Pennybag(the main character of monopoly) draws a card,",
-            black, 640, 445, 10, 10)
-        text_to_button2("player is entitled to do whatever is written on that card.", black, 206, 465, 10, 10)
-        text_to_button("Community Chest :", blue, 120, 500, 10, 10)
-        text_to_button2(
-            "Community Chest is another of the two types of card-drawing spaces in Monopoly. If a player lands on a space marked for 'Community Chest', Uncle Pennybag(the main character of ",
-            black, 640, 530, 10, 10)
-        text_to_button2("monopoly) draws a card, and the player is entitled to do whatever is written on that card.",
-                        black, 317, 550, 10, 10)
-
+            "  7. when the player tell a story, the other players need to mark if the story fits or not .",
+            black, 628, 400, 10, 10)
         button("back", 300, 600, 150, 40, darkblue, blue, action="back")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()

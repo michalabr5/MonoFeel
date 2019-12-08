@@ -3,6 +3,26 @@ import time  # To delay the execution of a certain code, as will be explained wh
 import random  # To generate a random number, substituting the actual dice!
 import pygame.mixer  # For sound effects
 
+
+import sqlite3
+conn = sqlite3.connect('NounsMissionsFeelings.db')
+c = conn.cursor()  # The database will be saved in the location where your 'py' file is saved
+
+# Create table - NOUNS
+c.execute('''CREATE TABLE IF NOT EXISTS NOUNS
+             ([generated_id] INTEGER PRIMARY KEY,[Noun_Name] text)''')
+
+# Create table - FEELINFS
+c.execute('''CREATE TABLE IF NOT EXISTS FEELINGS
+             ([generated_id] INTEGER PRIMARY KEY,[Feeling_Name] text)''')
+
+# Create table - MISSIONS
+c.execute('''CREATE TABLE IF NOT EXISTS MISSIONS
+             ([generated_id] INTEGER PRIMARY KEY,[Mission_Name] text)''')
+
+conn.commit()
+
+
 pygame.init()  # pygame initialisation
 pygame.font.init()  # font initialisation
 pygame.mixer.init()  # sounds initialisation
@@ -30,10 +50,10 @@ pygame.display.set_caption('MONOFEEL')  # Title
 
 #--- ADD TOOLS FOR PLAYERS
 # Dimensions of marbles for both the players
-x1 = 267
-y1 = 536
-x2 = 267
-y2 = 566
+x1 = 1050
+y1 = 585
+x2 = 1030
+y2 = 585
 
 # Fonts initialisation
 font = pygame.font.Font(None, 25)
@@ -51,7 +71,6 @@ def message_to_screen(msg, color):
 
 # Dice function which generates a random number between 1 to 6
 a = 0
-#---ADD ANIMATION
 def dice():
     b = 0
     global a
@@ -72,16 +91,30 @@ def alternate():
 
 alt = True  # The first call to alternate will return False (0)
 
-#---DB NOUNS
-# The cost function which deducts or increases the 'CashinHand' of player, whenever the player lands on a certain box.
-initial_cost1 = 50000
+
+initial_cost1 = 5 #number of nouns
+
+def onFeeling1(db_file):
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM FEELINGS")
+        rows = cur.fetchall()
+        feelingRow = random.choice(rows)
+        feeling=feelingRow[1]
+        print(feeling)
+        button(feeling, 565, 565, 200, 40, darkblue, green)
+
+
+
+
 
 
 def amountp1():
     global x1
     global y1
     global initial_cost1
-    if (x1 < 341 and y1 < 610 and y1 > 500):
+    onFeeling1('NounsMissionsFeelings.db')
+    """if (x1 < 341 and y1 < 610 and y1 > 500):
         initial_cost1 -= 0  # Start
     elif (x1 < 341 and y1 < 500 and y1 > 415):
         initial_cost1 -= 250
@@ -127,19 +160,19 @@ def amountp1():
     elif (y1 > 500 and x1 < 621 and y1 > 486):
         initial_cost1 -= 750
     elif (y1 > 500 and x1 < 486 and y1 > 341):
-        initial_cost1 -= 500
+        initial_cost1 -= 500"""
     return initial_cost1
 
 
 # Same for player 2
-initial_cost2 = 50000
+initial_cost2 = 5
 
 
 def amountp2():
     global x2
     global y2
     global initial_cost2
-    if (x2 < 341 and y2 < 610 and y2 > 500):
+    """if (x2 < 341 and y2 < 610 and y2 > 500):
         initial_cost2 -= 0  # Start
     elif (x2 < 341 and y2 < 500 and y2 > 415):
         initial_cost2 -= 250
@@ -185,7 +218,7 @@ def amountp2():
     elif (y2 > 500 and x2 < 621 and y2 > 486):
         initial_cost2 -= 750
     elif (y2 > 500 and x2 < 486 and y2 > 341):
-        initial_cost2 -= 500
+        initial_cost2 -= 500"""
     return initial_cost2
 
 
@@ -200,7 +233,7 @@ def game_controls():
                 quit()
 
         gamedisplay.fill(cream)
-        background = pygame.image.load('display.png')
+        background = pygame.image.load('logo.jpg')
         gamedisplay.blit(background, (450, 0))
         # using the defined text_to_button function in order to produce text to the screen
         text_to_button("INSTRUCTIONS", blue, 630, 125, 50, 100)
@@ -258,7 +291,7 @@ def gameloop():
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 cur = pygame.mouse.get_pos()
-                if ((765 > cur[0] > 565) and (690 > cur[1] > 650)):
+                if ((765 > cur[0] > 50) and (690 > cur[1] > 10)):
                     if (alternate() == 0):  # condition for alternate turn using the 'alternate' function
                         for i in range(dice()):
                             pygame.mixer.music.stop()
@@ -307,11 +340,11 @@ def gameloop():
 
         # printing all player related information on the screen
         player1_heading = font.render("Player 1", 1, green)
-        player1_subheading = font.render('CashinHand:' + str(initial_cost1), 1, black)
+        player1_subheading = font.render('Num Of Nouns:' + str(initial_cost1), 1, black)
         gamedisplay.blit(player1_heading, [70, 186])
         gamedisplay.blit(player1_subheading, [40, 220])
         player2_heading = font.render("Player 2", 1, blue)
-        player1_subheading = font.render('CashinHand:' + str(initial_cost2), 1, black)
+        player1_subheading = font.render('Num Of Nouns:' + str(initial_cost2), 1, black)
         gamedisplay.blit(player2_heading, [1165, 186])
         gamedisplay.blit(player1_subheading, [1120, 220])
         dicenumber = pygame.font.Font(None, 75)
@@ -389,7 +422,7 @@ def game_intro():
                 pygame.quit()
                 quit()
         gamedisplay.fill(violet)
-        background2 = pygame.image.load('monopoly2.jpeg')
+        background2 = pygame.image.load('start-pic.jpg')
         background = pygame.image.load('logo.jpg')  # Image in the background
         gamedisplay.blit(background2, (0, 0))
         gamedisplay.blit(background, (320, 200))  # Adding the image

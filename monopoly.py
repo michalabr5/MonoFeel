@@ -113,27 +113,28 @@ alt = True  # The first call to alternate will return False (0)
 initial_cost1 = 5 #number of nouns
 
 def onFeeling1(db_file):
-        conn = sqlite3.connect(db_file)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM FEELINGS")
-        rows = cur.fetchall()
-        feelingRow = random.choice(rows)
-        feeling=feelingRow[1]
-        display_surface = pygame.display.set_mode((200, 200))
-        text = font.render("feeling:    "+feeling, True, black, white)
-        textRect = text.get_rect()
-        textRect.center = (100, 100)
-        flag=True
-        while flag:
-            display_surface.fill(white)
-            display_surface.blit(text, textRect)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-
-                    # Draws the surface object to the screen.
-                pygame.display.update()
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM FEELINGS")
+    rows = cur.fetchall()
+    feelingRow = random.choice(rows)
+    feeling = feelingRow[1]
+    display_surface = pygame.display.set_mode((400, 400))
+    text = font.render("feeling:    " + feeling, True, black, white)
+    textRect = text.get_rect()
+    textRect.center = (200, 200)
+    for i in range(0, 3):
+        display_surface.fill(white)
+        display_surface.blit(text, textRect)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+  # Draws the surface object to the screen.
+            pygame.display.update()
+        time.sleep(1)
+    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
+    gameloop()
 
 
 def onMission1(db_file):
@@ -147,23 +148,24 @@ def onMission1(db_file):
     text = font.render("mission:    " + mission, True, black, white)
     textRect = text.get_rect()
     textRect.center = (200, 200)
-    flag = True
-    while flag:
+    for i in range(0, 3):
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
-                # Draws the surface object to the screen.
+  # Draws the surface object to the screen.
             pygame.display.update()
+        time.sleep(1)
+    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
+    gameloop()
 
 def amountp1():
     global x1
     global y1
     global initial_cost1
-    onMission1('NounsMissionsFeelings.db')
+    onFeeling1('NounsMissionsFeelings.db')
     """if (x1 < 341 and y1 < 610 and y1 > 500):
         initial_cost1 -= 0  # Start
     elif (x1 < 341 and y1 < 500 and y1 > 415):

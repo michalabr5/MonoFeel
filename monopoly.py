@@ -5,6 +5,7 @@ import pygame.mixer  # For sound effects
 
 
 import sqlite3
+
 conn = sqlite3.connect('NounsMissionsFeelings.db')
 c = conn.cursor()  # The database will be saved in the location where your 'py' file is saved
 
@@ -39,8 +40,6 @@ c.execute('''CREATE TABLE IF NOT EXISTS GUIDERS
 
 conn1.commit()
 
-
-
 pygame.init()  # pygame initialisation
 pygame.font.init()  # font initialisation
 pygame.mixer.init()  # sounds initialisation
@@ -66,7 +65,7 @@ display_height = 710
 gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
 pygame.display.set_caption('MONOFEEL')  # Title
 
-#--- ADD TOOLS FOR PLAYERS
+# --- ADD TOOLS FOR PLAYERS
 # Dimensions of marbles for both the players
 x1 = 1050
 y1 = 585
@@ -89,6 +88,8 @@ def message_to_screen(msg, color):
 
 # Dice function which generates a random number between 1 to 6
 a = 0
+
+
 def dice():
     b = 0
     global a
@@ -109,8 +110,8 @@ def alternate():
 
 alt = True  # The first call to alternate will return False (0)
 
+initial_cost1 = 5  # number of nouns
 
-initial_cost1 = 5 #number of nouns
 
 def onFeeling1(db_file):
     conn = sqlite3.connect(db_file)
@@ -119,22 +120,21 @@ def onFeeling1(db_file):
     rows = cur.fetchall()
     feelingRow = random.choice(rows)
     feeling = feelingRow[1]
-    display_surface = pygame.display.set_mode((400, 400))
+    display_surface = pygame.display.set_mode((200, 200))
     text = font.render("feeling:    " + feeling, True, black, white)
     textRect = text.get_rect()
-    textRect.center = (200, 200)
-    for i in range(0, 3):
+    textRect.center = (100, 100)
+    flag = True
+    while flag:
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-  # Draws the surface object to the screen.
+
+                # Draws the surface object to the screen.
             pygame.display.update()
-        time.sleep(1)
-    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
-    gameloop()
 
 
 def onMission1(db_file):
@@ -148,24 +148,26 @@ def onMission1(db_file):
     text = font.render("mission:    " + mission, True, black, white)
     textRect = text.get_rect()
     textRect.center = (200, 200)
-    for i in range(0, 3):
+    for i in range(0, 1):
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-  # Draws the surface object to the screen.
+
+                # Draws the surface object to the screen.
             pygame.display.update()
         time.sleep(1)
     gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
     gameloop()
 
+
 def amountp1():
     global x1
     global y1
     global initial_cost1
-    onFeeling1('NounsMissionsFeelings.db')
+    onMission1('NounsMissionsFeelings.db')
     """if (x1 < 341 and y1 < 610 and y1 > 500):
         initial_cost1 -= 0  # Start
     elif (x1 < 341 and y1 < 500 and y1 > 415):
@@ -313,6 +315,71 @@ def game_controls():
         pygame.display.update()
 
 
+class Rect():
+    def __init__(self, name, color, x, y):
+        self.rect = pygame.Rect(50, 50, 50, 50)
+        self.rect.x = x
+        self.rect.y = y
+        self.name = name
+        self.color = color
+
+    def Draw(self):
+        pygame.draw.rect(gamedisplay, (self.color), self.rect)
+
+
+# The side function responsible for game controls. i.e. the INSTRUCTION button as well as the quit button!
+def choose_color():
+    global firstc
+    global secc
+    all_rects = []
+    gcont = True
+    currp = 1
+    firstc = "NONE"
+    secc = "NONE"
+    pygame.mixer.music.stop()
+    while gcont:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cur = pygame.mouse.get_pos()
+                for rect in all_rects:
+                    if rect.rect.collidepoint(cur):
+                        if (currp == 1):
+                            firstc = rect.name
+                            currp = 2
+                            break
+                        if (currp == 2):
+                            secc = rect.name
+                            currp = 1
+                            break
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # using the defined text_to_button function in order to produce text to the screen
+        NAME_TO_RGBA = {'red': (255, 0, 0, 255), 'blue': (0, 0, 255, 255), 'green': (0, 255, 0, 255),
+                        'white': (255, 255, 255, 0)}
+        x, y = 628, 220
+        i = 0
+        text_to_button2("First player color:" + firstc, black, 600, 180, 10, 10)
+        text_to_button2("Second player color:" + secc, black, 600, 200, 10, 10)
+        text_to_button2("RED", black, 580, 250, 10, 10)
+        text_to_button2("BLUE", black, 580, 350, 10, 10)
+        text_to_button2("GREEN", black, 580, 450, 10, 10)
+        text_to_button2("WHITE", black, 580, 550, 10, 10)
+        for name in NAME_TO_RGBA.keys():
+            rgba = NAME_TO_RGBA[name]
+            rect = Rect(name, rgba, x, y)
+            all_rects.append(rect)
+            rect.Draw()
+            y += 100
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+
+
 # The main function responsible for the game-play.Everything after clicking the play button is hard-coded in the given fubction
 def gameloop():
     global x1
@@ -372,15 +439,43 @@ def gameloop():
         gamedisplay.blit(background1, (220, 50))
         button("ROLL THE DICE", 565, 650, 200, 40, darkblue, green, action="roll")
 
-        pygame.draw.circle(gamedisplay, green, [x1, y1], 10)  # Marbles on screen
-        pygame.draw.circle(gamedisplay, blue, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
+        if (firstc=="red"):
+            pygame.draw.circle(gamedisplay, red, [x1, y1], 10)  # Marbles on screen
+        elif (firstc=="blue"):
+            pygame.draw.circle(gamedisplay, blue, [x1, y1], 10)  # Marbles on screen
+        elif (firstc=="white"):
+            pygame.draw.circle(gamedisplay, white, [x1, y1], 10)  # Marbles on screen
+        else:
+            pygame.draw.circle(gamedisplay, green, [x1, y1], 10)  # Marbles on screen
+        if (secc == "red"):
+            pygame.draw.circle(gamedisplay,red, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
+        elif (firstc == "blue"):
+            pygame.draw.circle(gamedisplay,blue, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
+        elif (firstc == "white"):
+            pygame.draw.circle(gamedisplay,white, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
+        else:
+            pygame.draw.circle(gamedisplay,green, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
-        player1_heading = font.render("Player 1", 1, green)
+        if (firstc=="red"):
+            player1_heading = font.render("Player 1", 1, red)
+        elif (firstc=="blue"):
+            player1_heading = font.render("Player 1", 1, blue)
+        elif (firstc=="white"):
+            player1_heading = font.render("Player 1", 1, white)
+        else:
+            player1_heading = font.render("Player 1", 1, green)
         player1_subheading = font.render('Num Of Nouns:' + str(initial_cost1), 1, black)
         gamedisplay.blit(player1_heading, [70, 186])
         gamedisplay.blit(player1_subheading, [40, 220])
-        player2_heading = font.render("Player 2", 1, blue)
+        if (secc == "red"):
+            player2_heading = font.render("Player 2", 1, red)
+        elif (secc == "blue"):
+            player2_heading = font.render("Player 2", 1, blue)
+        elif (secc == "white"):
+            player2_heading = font.render("Player 2", 1, white)
+        else:
+            player2_heading = font.render("Player 2", 1, green)
         player1_subheading = font.render('Num Of Nouns:' + str(initial_cost2), 1, black)
         gamedisplay.blit(player2_heading, [1165, 186])
         gamedisplay.blit(player1_subheading, [1120, 220])
@@ -407,6 +502,8 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 gameloop()
             if action == "back":
                 game_intro()
+            if action == "ChooseColor":
+                choose_color()
             if action == "roll":
                 pygame.display.update()
 
@@ -465,10 +562,9 @@ def game_intro():
         gamedisplay.blit(background, (320, 200))  # Adding the image
 
         button("PLAY", 300, 500, 150, 40, darkblue, blue,
-               action="play")  # Creating buttons using the predefined function 'button'
+               action="ChooseColor")  # Creating buttons using the predefined function 'button'
         button("INSTRUCTIONS", 570, 500, 220, 40, lightyellow, yellow, action="controls")
         button("QUIT", 900, 500, 150, 40, lightgreen, green, action="quit")
-
         pygame.display.update()
 
 

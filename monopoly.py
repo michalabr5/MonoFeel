@@ -136,6 +136,29 @@ def onFeeling1(db_file):
                 # Draws the surface object to the screen.
             pygame.display.update()
 
+def fiveNounsStart(db_file):
+    nouns=[]
+    for i in range(5):
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM NOUNS")
+        rows = cur.fetchall()
+        nounRow = random.choice(rows)
+        nouns.append(nounRow[1])
+    assert (len(nouns) == 5)
+    return nouns
+def drawFive(nouns,x,y):
+    all_rects = []
+    for noun in nouns:
+        rect=Rect(noun,white,x,y)
+        all_rects.append(rect)
+        rect.Draw()
+        nounText = font.render(noun, 1, black)
+        gamedisplay.blit(nounText, [x,y])
+        y+=60
+    pygame.display.update()
+
+
 
 def onMission1(db_file):
     conn = sqlite3.connect(db_file)
@@ -167,7 +190,6 @@ def amountp1():
     global x1
     global y1
     global initial_cost1
-    onMission1('NounsMissionsFeelings.db')
     """if (x1 < 341 and y1 < 610 and y1 > 500):
         initial_cost1 -= 0  # Start
     elif (x1 < 341 and y1 < 500 and y1 > 415):
@@ -379,7 +401,10 @@ def choose_color():
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
 
-
+global nouns1
+global nouns2
+nouns1 =  fiveNounsStart('NounsMissionsFeelings.db')
+nouns2 =  fiveNounsStart('NounsMissionsFeelings.db')
 # The main function responsible for the game-play.Everything after clicking the play button is hard-coded in the given fubction
 def gameloop():
     global x1
@@ -449,14 +474,16 @@ def gameloop():
             pygame.draw.circle(gamedisplay, green, [x1, y1], 10)  # Marbles on screen
         if (secc == "red"):
             pygame.draw.circle(gamedisplay,red, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
-        elif (firstc == "blue"):
+        elif (secc == "blue"):
             pygame.draw.circle(gamedisplay,blue, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
-        elif (firstc == "white"):
+        elif (secc == "white"):
             pygame.draw.circle(gamedisplay,white, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
         else:
             pygame.draw.circle(gamedisplay,green, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
+        drawFive(nouns1,1170,300)
+        drawFive(nouns2,70,300)
         if (firstc=="red"):
             player1_heading = font.render("Player 1", 1, red)
         elif (firstc=="blue"):
@@ -559,7 +586,7 @@ def game_intro():
         background2 = pygame.image.load('start-pic.jpg')
         background = pygame.image.load('logo.jpg')  # Image in the background
         gamedisplay.blit(background2, (0, 0))
-        gamedisplay.blit(background, (320, 200))  # Adding the image
+        gamedisplay.blit(background, (840, 50))  # Adding the image
 
         button("PLAY", 300, 500, 150, 40, darkblue, blue,
                action="ChooseColor")  # Creating buttons using the predefined function 'button'

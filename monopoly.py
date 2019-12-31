@@ -147,6 +147,14 @@ def fiveNounsStart(db_file):
         nouns.append(nounRow[1])
     assert (len(nouns) == 5)
     return nouns
+
+def passwordsAdmin(db_file):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute("SELECT distinct Admin_Password FROM ADMINS")
+    rows = cur.fetchall()
+    return rows
+
 def drawFive(nouns,x,y):
     all_rects = []
     for noun in nouns:
@@ -348,6 +356,85 @@ class Rect():
     def Draw(self):
         pygame.draw.rect(gamedisplay, (self.color), self.rect)
 
+def admin_login():
+    background = pygame.image.load('logo.jpg')
+    pygame.mixer.music.stop()
+    input_box = pygame.Rect(570, 300, 140, 32)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        print(text)
+                        text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        text_to_button2("PASSWORD: ", black, 480, 310, 10, 10)
+        # Blit the text.
+        gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(gamedisplay, color, input_box, 2)
+
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+        pwds=passwordsAdmin('USERS.db')
+        for i in range(len(pwds)):
+            if(text == pwds[i][0]):
+               admin_screen()
+
+def admin_screen():
+    pygame.mixer.music.stop()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cur = pygame.mouse.get_pos()
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # using the defined text_to_button function in order to produce text to the screen
+        button("Words", 600, 190, 100, 40,white,lightyellow)
+        button("Feelings",  600, 250, 100, 40,white,lightyellow)
+        button("Missions",  600, 310, 100, 40,white,lightyellow)
+        button("Players",  600, 370, 100, 40,white,lightyellow)
+        button("Tokens", 600, 430, 100, 40,white,lightyellow)
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
 
 # The side function responsible for game controls. i.e. the INSTRUCTION button as well as the quit button!
 def choose_color():
@@ -400,6 +487,7 @@ def choose_color():
         button("play", 600, 600, 150, 40, lightgreen, green, action="play")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
+
 
 global nouns1
 global nouns2
@@ -531,6 +619,10 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 game_intro()
             if action == "ChooseColor":
                 choose_color()
+            if action=="AdminLogin":
+                admin_login()
+            if action == "AdminScreen":
+                admin_screen()
             if action == "roll":
                 pygame.display.update()
 
@@ -591,6 +683,7 @@ def game_intro():
         button("PLAY", 300, 500, 150, 40, darkblue, blue,
                action="ChooseColor")  # Creating buttons using the predefined function 'button'
         button("INSTRUCTIONS", 570, 500, 220, 40, lightyellow, yellow, action="controls")
+        button("ADMIN", 570, 600, 220, 40, lightblue, red, action="AdminLogin")
         button("QUIT", 900, 500, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
 

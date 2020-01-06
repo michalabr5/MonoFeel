@@ -2,7 +2,7 @@ import pygame  # The main module!
 import time  # To delay the execution of a certain code, as will be explained wherever used!
 import random  # To generate a random number, substituting the actual dice!
 import pygame.mixer  # For sound effects
-
+import ast
 
 import sqlite3
 
@@ -39,6 +39,15 @@ c.execute('''CREATE TABLE IF NOT EXISTS GUIDERS
              ([generated_id] INTEGER PRIMARY KEY,[Guider_Password] text)''')
 
 conn1.commit()
+conn2 = sqlite3.connect('Tokens.db')
+c = conn2.cursor()  # The database will be saved in the location where your 'py' file is saved
+
+# Create table - TOKENS
+c.execute('''CREATE TABLE IF NOT EXISTS TOKENS
+             ([generated_id] INTEGER PRIMARY KEY,[Color_Name] text,[RED] INTEGER,[GREEN] INTEGER,[BLUE] INTEGER)''')
+
+
+conn2.commit()
 
 pygame.init()  # pygame initialisation
 pygame.font.init()  # font initialisation
@@ -147,6 +156,21 @@ def fiveNounsStart(db_file):
         nouns.append(nounRow[1])
     assert (len(nouns) == 5)
     return nouns
+
+def passwordsAdmin(db_file):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute("SELECT distinct Admin_Password FROM ADMINS")
+    rows = cur.fetchall()
+    return rows
+
+def passwordsOb(db_file):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute("SELECT distinct Guider_Password FROM GUIDERS")
+    rows = cur.fetchall()
+    return rows
+
 def drawFive(nouns,x,y):
     all_rects = []
     for noun in nouns:
@@ -156,7 +180,6 @@ def drawFive(nouns,x,y):
         nounText = font.render(noun, 1, black)
         gamedisplay.blit(nounText, [x,y])
         y+=60
-    pygame.display.update()
 
 
 
@@ -348,16 +371,461 @@ class Rect():
     def Draw(self):
         pygame.draw.rect(gamedisplay, (self.color), self.rect)
 
+def login(user):
+    background = pygame.image.load('logo.jpg')
+    pygame.mixer.music.stop()
+    input_box = pygame.Rect(570, 300, 140, 32)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    color = color_inactive
+    active = False
+    text = ''
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+                # Change the current color of the input box.
+                color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_RETURN:
+                        text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
+
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # Render the current text.
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        text_to_button2("PASSWORD: ", black, 480, 310, 10, 10)
+        # Blit the text.
+        gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(gamedisplay, color, input_box, 2)
+
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+        if user=='a':
+            pwds=passwordsAdmin('USERS.db')
+            for i in range(len(pwds)):
+                if(text == pwds[i][0]):
+                    admin_screen()
+        else:
+            pwds = passwordsOb('USERS.db')
+            for i in range(len(pwds)):
+                if (text == pwds[i][0]):
+                    ob_screen()
+
+def ob_screen():
+    print ("ob_screen")
+
+def admin_screen():
+    pygame.mixer.music.stop()
+    cur=(0,0)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cur = pygame.mouse.get_pos()
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # using the defined text_to_button function in order to produce text to the screen
+        button("Nouns", 600, 190, 100, 40,white,lightyellow,action="nouns")
+        button("Feelings",  600, 250, 100, 40,white,lightyellow, action="feelings")
+        button("Missions",  600, 310, 100, 40,white,lightyellow, action="missions")
+        button("Players",  600, 370, 100, 40,white,lightyellow, action="players")
+        button("Tokens", 600, 430, 100, 40,white,lightyellow, action="tokens")
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+
+def wordsAdmin(db_file,com,str1,str2):
+    input_box = pygame.Rect(600, 600, 140, 32)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    color = color_inactive
+    active = False
+    text = ''
+    word=''
+    gcont = True
+    pygame.mixer.music.stop()
+    while gcont:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+            color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    elif (event.key!=pygame.K_RETURN):
+                        text += event.unicode
+                    else:
+                        word = text
+                        text=''
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        # Blit the text.
+        gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(gamedisplay, color, input_box, 2)
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute(com)
+        rows = cur.fetchall()
+        all_nouns=[]
+        x, y = 400, 180
+        for i in rows:
+            all_nouns.append(i[0])
+        for noun in all_nouns:
+            text_to_button2(noun, black, x, y, 50, 10)
+            y += 40
+            if (y>500):
+                x = x+220
+                y=180
+        if word in all_nouns:
+            cur.execute(str1 + word + "'")
+            word=''
+        else:
+            cur.execute(str2+word+"')")
+            word=''
+        conn.commit()
+        button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+
+def playersAdmin(db_file):
+    input_boxName = pygame.Rect(600, 550, 140, 32)
+    input_boxAge = pygame.Rect(600, 600, 140, 32)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    colorName = color_inactive
+    colorAge = color_inactive
+    activeName = False
+    activeAge = False
+    age=''
+    textName = ''
+    textAge=''
+    word=''
+    gcont = True
+    pygame.mixer.music.stop()
+    while gcont:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_boxName.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    activeName = not activeName
+                else:
+                    activeName = False
+                if input_boxAge.collidepoint(event.pos):
+                     # Toggle the active variable.
+                    activeAge = not activeAge
+                else:
+                    activeAge = False
+            colorName = color_active if activeName else color_inactive
+            colorAge = color_active if activeAge else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if activeName:
+                    if event.key == pygame.K_BACKSPACE:
+                        textName = textName[:-1]
+                    elif (event.key==pygame.K_RETURN):
+                        textName = textName
+                    else:
+                        textName += event.unicode
+
+                if activeAge:
+                    if event.key == pygame.K_BACKSPACE:
+                        textAge = textAge[:-1]
+                    elif (event.key!=pygame.K_RETURN):
+                        textAge += event.unicode
+                    else:
+                        age = textAge
+                        textAge=''
+                        word = textName
+                        textName = ''
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        txt_surfaceName = font.render(textName, True, colorName)
+        txt_surfaceAge = font.render(textAge, True, colorAge)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surfaceAge.get_width() + 10)
+        input_boxName.w = width
+        input_boxAge.w = width
+        # Blit the text.
+        gamedisplay.blit(txt_surfaceName, (input_boxName.x + 5, input_boxName.y + 5))
+        gamedisplay.blit(txt_surfaceAge, (input_boxAge.x + 5, input_boxAge.y + 5))
+        # Blit the input_box rect.
+        text_to_button2("Username: ", black, 540, 560, 10, 10)
+        text_to_button2("Age: ", black, 550, 610, 10, 10)
+        pygame.draw.rect(gamedisplay, colorName, input_boxName, 2)
+        pygame.draw.rect(gamedisplay, colorAge, input_boxAge, 2)
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("SELECT distinct Player_Name FROM PLAYERS")
+        rowsNames = cur.fetchall()
+        cur.execute("SELECT Player_Age FROM PLAYERS")
+        rowsAges = cur.fetchall()
+        all_names=[]
+        all_ages=[]
+        text_to_button2("Username", black, 400, 170, 50, 10)
+        text_to_button2("Age", black, 500, 170, 50, 10)
+        x, y = 400, 210
+        xa, ya = 500,210
+        for i in rowsNames:
+            all_names.append(i[0])
+        for j in rowsAges:
+            all_ages.append(j[0])
+        for name in all_names:
+            text_to_button2(name, black, x, y, 50, 10)
+            y += 40
+            if (y>500):
+                x = x+220
+                y=180
+        for dbage in all_ages:
+            text_to_button2(str(dbage), black, xa, ya, 50, 10)
+            ya += 40
+            if (ya>500):
+                xa = xa+270
+                ya=180
+        if word in all_names:
+            cur.execute("DELETE FROM PLAYERS WHERE Player_Name='" + word + "' AND Player_Age="+str(age))
+            conn.commit()
+            word=''
+            age=''
+        elif (word != ''):
+            cur.execute("INSERT INTO PLAYERS (Player_Name, Player_Age) VALUES ('"+word+"','"+str(age)+"')")
+            conn.commit()
+            word=''
+            age=''
+        button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+
+def tokensAdmin(db_file):
+    input_boxName = pygame.Rect(600, 550, 140, 32)
+    input_boxR = pygame.Rect(605, 600, 20, 20)
+    input_boxG = pygame.Rect(675, 600, 20, 20)
+    input_boxB = pygame.Rect(745, 600, 20, 20)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    colorName = color_inactive
+    colorR = color_inactive
+    colorG = color_inactive
+    colorB = color_inactive
+    activeName = False
+    activeR = False
+    activeG = False
+    activeB = False
+    r=''
+    g=''
+    b=''
+    textName = ''
+    textR=''
+    textG = ''
+    textB = ''
+    word=''
+    gcont = True
+    pygame.mixer.music.stop()
+    while gcont:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_boxName.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    activeName = not activeName
+                else:
+                    activeName = False
+                if input_boxR.collidepoint(event.pos):
+                     # Toggle the active variable.
+                    activeR = not activeR
+                else:
+                    activeR = False
+                if input_boxB.collidepoint(event.pos):
+                     # Toggle the active variable.
+                    activeB = not activeB
+                else:
+                    activeB = False
+                if input_boxG.collidepoint(event.pos):
+                     # Toggle the active variable.
+                    activeG = not activeG
+                else:
+                    activeG = False
+            colorName = color_active if activeName else color_inactive
+            colorR = color_active if activeR else color_inactive
+            colorG = color_active if activeG else color_inactive
+            colorB = color_active if activeB else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if activeName:
+                    if event.key == pygame.K_BACKSPACE:
+                        textName = textName[:-1]
+                    elif (event.key==pygame.K_RETURN):
+                        textName = textName
+                    else:
+                        textName += event.unicode
+
+                if activeR:
+                    if event.key == pygame.K_BACKSPACE:
+                        textR = textR[:-1]
+                    elif (event.key == pygame.K_RETURN):
+                        textR = textR
+                    else:
+                        textR += event.unicode
+                if activeG:
+                    if event.key == pygame.K_BACKSPACE:
+                        textG = textG[:-1]
+                    elif (event.key == pygame.K_RETURN):
+                        textG = textG
+                    else:
+                        textG += event.unicode
+                if activeB:
+                    if event.key == pygame.K_BACKSPACE:
+                        textB = textB[:-1]
+                    elif (event.key!=pygame.K_RETURN):
+                        textB += event.unicode
+                    else:
+                        r=textR
+                        g=textG
+                        b = textB
+                        textR = ''
+                        textG = ''
+                        textB=''
+                        word = textName
+                        textName = ''
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        txt_surfaceName = font.render(textName, True, colorName)
+        txt_surfaceR = font.render(textR, True, colorR)
+        txt_surfaceG = font.render(textG, True, colorG)
+        txt_surfaceB = font.render(textB, True, colorB)
+        # Resize the box if the text is too long.
+        widthName = max(200, txt_surfaceName.get_width() + 10)
+        widthColor = max(50, txt_surfaceR.get_width() + 10)
+        input_boxName.w = widthName
+        input_boxR.w = widthColor
+        input_boxG.w = widthColor
+        input_boxB.w = widthColor
+        # Blit the text.
+        gamedisplay.blit(txt_surfaceName, (input_boxName.x + 5, input_boxName.y + 5))
+        gamedisplay.blit(txt_surfaceR, (input_boxR.x + 5, input_boxR.y + 5))
+        gamedisplay.blit(txt_surfaceG, (input_boxG.x + 5, input_boxG.y + 5))
+        gamedisplay.blit(txt_surfaceB, (input_boxB.x + 5, input_boxB.y + 5))
+        # Blit the input_box rect.
+        text_to_button2("Color Name: ", black, 540, 560, 10, 10)
+        text_to_button2("R: ", black, 590, 600, 10, 10)
+        text_to_button2("G: ", black, 662, 600, 10, 10)
+        text_to_button2("B: ", black, 732, 600, 10, 10)
+        pygame.draw.rect(gamedisplay, colorName, input_boxName, 2)
+        pygame.draw.rect(gamedisplay, colorR, input_boxR, 2)
+        pygame.draw.rect(gamedisplay, colorG, input_boxG, 2)
+        pygame.draw.rect(gamedisplay, colorB, input_boxB, 2)
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("SELECT distinct Color_Name FROM TOKENS")
+        rowsNames = cur.fetchall()
+        cur.execute("SELECT RED FROM TOKENS")
+        rowsRed = cur.fetchall()
+        cur.execute("SELECT GREEN FROM TOKENS")
+        rowsGreen = cur.fetchall()
+        cur.execute("SELECT BLUE FROM TOKENS")
+        rowsBlue = cur.fetchall()
+        all_names=[]
+        all_red=[]
+        all_green = []
+        all_blue = []
+        text_to_button2("Color", black, 400, 170, 50, 10)
+        text_to_button2("RGB", black, 500, 170, 50, 10)
+        x, y = 400, 210
+        xa, ya = 500,210
+        for i in rowsNames:
+            all_names.append(i[0])
+        for j in rowsRed:
+            all_red.append(j[0])
+        for k in rowsBlue:
+            all_blue.append(k[0])
+        for t in rowsGreen:
+            all_green.append(t[0])
+        for name in all_names:
+            text_to_button2(name, black, x, y, 50, 10)
+            y += 40
+            if (y>500):
+                x = x+220
+                y=180
+        for dbrgb in range (len(all_red)):
+            text_to_button2('('+str(all_red[dbrgb])+','+str(all_green[dbrgb])+','+str(all_blue[dbrgb])+')', black, xa, ya, 50, 10)
+            ya += 40
+            if (ya>500):
+                xa = xa+270
+                ya=180
+        if word in all_names:
+            cur.execute("DELETE FROM TOKENS WHERE Color_Name='" + word + "' AND RED="+str(r)+ " AND GREEN="+str(g)+ " AND BLUE="+str(b))
+            conn.commit()
+            word=''
+            r = ''
+            g = ''
+            b = ''
+        elif (word != ''):
+            cur.execute("INSERT INTO TOKENS (Color_Name, RED, GREEN, BLUE) VALUES ('"+word+"','"+str(r)+"','"+str(g)+"','"+str(b)+"')")
+            conn.commit()
+            word=''
+            age=''
+        button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
 
 # The side function responsible for game controls. i.e. the INSTRUCTION button as well as the quit button!
-def choose_color():
-    global firstc
-    global secc
+def choose_color(db_file):
+    global firstc, firstrgb
+    global secc, secrgb
     all_rects = []
     gcont = True
     currp = 1
     firstc = "NONE"
     secc = "NONE"
+    firstrgb = "NONE"
+    secrgb = "NONE"
     pygame.mixer.music.stop()
     while gcont:
         for event in pygame.event.get():
@@ -370,36 +838,68 @@ def choose_color():
                     if rect.rect.collidepoint(cur):
                         if (currp == 1):
                             firstc = rect.name
+                            firstrgb=rect.color
                             currp = 2
                             break
                         if (currp == 2):
                             secc = rect.name
+                            secrgb = rect.color
                             currp = 1
                             break
         gamedisplay.fill(cream)
         background = pygame.image.load('logo.jpg')
         gamedisplay.blit(background, (450, 0))
         # using the defined text_to_button function in order to produce text to the screen
-        NAME_TO_RGBA = {'red': (255, 0, 0, 255), 'blue': (0, 0, 255, 255), 'green': (0, 255, 0, 255),
-                        'white': (255, 255, 255, 0)}
-        x, y = 628, 220
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        cur.execute("SELECT distinct Color_Name FROM TOKENS")
+        rowsNames = cur.fetchall()
+        cur.execute("SELECT RED FROM TOKENS")
+        rowsRed = cur.fetchall()
+        cur.execute("SELECT GREEN FROM TOKENS")
+        rowsGreen = cur.fetchall()
+        cur.execute("SELECT BLUE FROM TOKENS")
+        rowsBlue = cur.fetchall()
+        all_names = []
+        all_red = []
+        all_green = []
+        all_blue = []
+        NAME_TO_RGBA = {}
+
+        for i in rowsNames:
+            all_names.append(i[0])
+        for j in rowsRed:
+            all_red.append(j[0])
+        for k in rowsBlue:
+            all_blue.append(k[0])
+        for t in rowsGreen:
+            all_green.append(t[0])
+
+        for dbrgb in range(len(all_red)):
+            NAME_TO_RGBA[all_names[dbrgb]] = ast.literal_eval("("+str(all_red[dbrgb]) + ',' + str(all_green[dbrgb]) + ',' + str(all_blue[dbrgb])+")")
+        x, y = 428, 220
+        xn,yn = 390,245
         i = 0
         text_to_button2("First player color:" + firstc, black, 600, 180, 10, 10)
         text_to_button2("Second player color:" + secc, black, 600, 200, 10, 10)
-        text_to_button2("RED", black, 580, 250, 10, 10)
-        text_to_button2("BLUE", black, 580, 350, 10, 10)
-        text_to_button2("GREEN", black, 580, 450, 10, 10)
-        text_to_button2("WHITE", black, 580, 550, 10, 10)
         for name in NAME_TO_RGBA.keys():
-            rgba = NAME_TO_RGBA[name]
+            text_to_button2(name, black, xn, yn, 10, 10)
+            rgba = (NAME_TO_RGBA[name])
             rect = Rect(name, rgba, x, y)
             all_rects.append(rect)
             rect.Draw()
             y += 100
+            yn+=100
+            if (y>500):
+                x = x+220
+                xn = xn +220
+                y=220
+                yn = 245
         button("back", 300, 600, 150, 40, darkblue, blue, action="back")
         button("play", 600, 600, 150, 40, lightgreen, green, action="play")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
+
 
 global nouns1
 global nouns2
@@ -464,22 +964,8 @@ def gameloop():
         gamedisplay.blit(background1, (220, 50))
         button("ROLL THE DICE", 565, 650, 200, 40, darkblue, green, action="roll")
 
-        if (firstc=="red"):
-            pygame.draw.circle(gamedisplay, red, [x1, y1], 10)  # Marbles on screen
-        elif (firstc=="blue"):
-            pygame.draw.circle(gamedisplay, blue, [x1, y1], 10)  # Marbles on screen
-        elif (firstc=="white"):
-            pygame.draw.circle(gamedisplay, white, [x1, y1], 10)  # Marbles on screen
-        else:
-            pygame.draw.circle(gamedisplay, green, [x1, y1], 10)  # Marbles on screen
-        if (secc == "red"):
-            pygame.draw.circle(gamedisplay,red, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
-        elif (secc == "blue"):
-            pygame.draw.circle(gamedisplay,blue, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
-        elif (secc == "white"):
-            pygame.draw.circle(gamedisplay,white, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
-        else:
-            pygame.draw.circle(gamedisplay,green, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
+        pygame.draw.circle(gamedisplay, firstrgb, [x1, y1],10)  # Cordinates are in form of variables, for their movement!
+        pygame.draw.circle(gamedisplay, secrgb, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
         drawFive(nouns1,1170,300)
@@ -525,12 +1011,30 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 quit()
             if action == "controls":
                 game_controls()
+            if action=="players":
+                playersAdmin('Users.db')
+            if action=="tokens":
+                tokensAdmin('Tokens.db')
+            if action=="nouns":
+                wordsAdmin('NounsMissionsFeelings.db',"SELECT distinct Noun_Name FROM NOUNS","DELETE FROM NOUNS WHERE Noun_Name='","INSERT INTO NOUNS (Noun_Name) VALUES ('")
+            if action == "missions":
+                wordsAdmin('NounsMissionsFeelings.db', "SELECT distinct Mission_Name FROM MISSIONS","DELETE FROM MISSIONS WHERE Mission_Name='","INSERT INTO MISSIONS (Mission_Name) VALUES ('")
+            if action=="feelings":
+                wordsAdmin('NounsMissionsFeelings.db', "SELECT distinct Feeling_Name FROM FEELINGS","DELETE FROM FEELINGS WHERE Feeling_Name='","INSERT INTO FEELINGS (Feeling_Name) VALUES ('")
             if action == "play":
                 gameloop()
             if action == "back":
                 game_intro()
+            if action == "backAd":
+                admin_screen()
             if action == "ChooseColor":
-                choose_color()
+                choose_color('Tokens.db')
+            if action=="AdminLogin":
+                login('a')
+            if action == "ObserverLogin":
+                login('o')
+            if action == "AdminScreen":
+                admin_screen()
             if action == "roll":
                 pygame.display.update()
 
@@ -591,6 +1095,8 @@ def game_intro():
         button("PLAY", 300, 500, 150, 40, darkblue, blue,
                action="ChooseColor")  # Creating buttons using the predefined function 'button'
         button("INSTRUCTIONS", 570, 500, 220, 40, lightyellow, yellow, action="controls")
+        button("ADMIN", 400, 600, 220, 40, lightblue, red, action="AdminLogin")
+        button("OBSERVER", 700, 600, 220, 40, lightblue, red, action="ObserverLogin")
         button("QUIT", 900, 500, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
 

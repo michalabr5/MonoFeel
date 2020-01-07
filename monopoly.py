@@ -977,7 +977,7 @@ def gameloop():
         background1 = pygame.image.load('board1.jpg')
         gamedisplay.blit(background1, (220, 50))
         button("ROLL THE DICE", 565, 650, 200, 40, darkblue, green, action="roll")
-
+        button("Quit", 130, 650, 200, 40, red, white, action="quit")
         pygame.draw.circle(gamedisplay, firstrgb, [x1, y1],10)  # Cordinates are in form of variables, for their movement!
         pygame.draw.circle(gamedisplay, secrgb, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 

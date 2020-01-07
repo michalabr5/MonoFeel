@@ -7,6 +7,7 @@ import ast
 import sqlite3
 
 conn = sqlite3.connect('NounsMissionsFeelings.db')
+assert(conn!=None)
 c = conn.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - NOUNS
@@ -24,6 +25,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS MISSIONS
 conn.commit()
 
 conn1 = sqlite3.connect('Users.db')
+assert(conn1!=None)
 c = conn1.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - PLAYERS
@@ -40,6 +42,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS GUIDERS
 
 conn1.commit()
 conn2 = sqlite3.connect('Tokens.db')
+assert(conn2!=None)
 c = conn2.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - TOKENS
@@ -124,6 +127,7 @@ initial_cost1 = 5  # number of nouns
 
 def onFeeling1(db_file):
     conn = sqlite3.connect(db_file)
+    assert(conn!=None)
     cur = conn.cursor()
     cur.execute("SELECT * FROM FEELINGS")
     rows = cur.fetchall()
@@ -149,6 +153,7 @@ def fiveNounsStart(db_file):
     nouns=[]
     for i in range(5):
         conn = sqlite3.connect(db_file)
+        assert(conn!=None)
         cur = conn.cursor()
         cur.execute("SELECT * FROM NOUNS")
         rows = cur.fetchall()
@@ -159,6 +164,7 @@ def fiveNounsStart(db_file):
 
 def passwordsAdmin(db_file):
     conn = sqlite3.connect(db_file)
+    assert(conn!=NotADirectoryError)
     cur = conn.cursor()
     cur.execute("SELECT distinct Admin_Password FROM ADMINS")
     rows = cur.fetchall()
@@ -166,6 +172,7 @@ def passwordsAdmin(db_file):
 
 def passwordsOb(db_file):
     conn = sqlite3.connect(db_file)
+    assert(conn!=None)
     cur = conn.cursor()
     cur.execute("SELECT distinct Guider_Password FROM GUIDERS")
     rows = cur.fetchall()
@@ -185,6 +192,7 @@ def drawFive(nouns,x,y):
 
 def onMission1(db_file):
     conn = sqlite3.connect(db_file)
+    assert(conn!=None)
     cur = conn.cursor()
     cur.execute("SELECT * FROM MISSIONS")
     rows = cur.fetchall()
@@ -504,6 +512,7 @@ def wordsAdmin(db_file,com,str1,str2):
         # Blit the input_box rect.
         pygame.draw.rect(gamedisplay, color, input_box, 2)
         conn = sqlite3.connect(db_file)
+        assert(conn!=None)
         cur = conn.cursor()
         cur.execute(com)
         rows = cur.fetchall()
@@ -599,6 +608,7 @@ def playersAdmin(db_file):
         pygame.draw.rect(gamedisplay, colorName, input_boxName, 2)
         pygame.draw.rect(gamedisplay, colorAge, input_boxAge, 2)
         conn = sqlite3.connect(db_file)
+        assert(conn!=None)
         cur = conn.cursor()
         cur.execute("SELECT distinct Player_Name FROM PLAYERS")
         rowsNames = cur.fetchall()
@@ -626,6 +636,7 @@ def playersAdmin(db_file):
             if (ya>500):
                 xa = xa+270
                 ya=180
+        assert(len(all_names)>0)
         if word in all_names:
             cur.execute("DELETE FROM PLAYERS WHERE Player_Name='" + word + "' AND Player_Age="+str(age))
             conn.commit()
@@ -762,6 +773,7 @@ def tokensAdmin(db_file):
         pygame.draw.rect(gamedisplay, colorG, input_boxG, 2)
         pygame.draw.rect(gamedisplay, colorB, input_boxB, 2)
         conn = sqlite3.connect(db_file)
+        assert(conn!=None)
         cur = conn.cursor()
         cur.execute("SELECT distinct Color_Name FROM TOKENS")
         rowsNames = cur.fetchall()
@@ -793,6 +805,7 @@ def tokensAdmin(db_file):
             if (y>500):
                 x = x+220
                 y=180
+        assert (len(all_red)!=0)
         for dbrgb in range (len(all_red)):
             text_to_button2('('+str(all_red[dbrgb])+','+str(all_green[dbrgb])+','+str(all_blue[dbrgb])+')', black, xa, ya, 50, 10)
             ya += 40
@@ -851,6 +864,7 @@ def choose_color(db_file):
         gamedisplay.blit(background, (450, 0))
         # using the defined text_to_button function in order to produce text to the screen
         conn = sqlite3.connect(db_file)
+        assert(conn!=None)
         cur = conn.cursor()
         cur.execute("SELECT distinct Color_Name FROM TOKENS")
         rowsNames = cur.fetchall()

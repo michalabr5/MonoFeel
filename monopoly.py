@@ -84,6 +84,12 @@ y1 = 585
 x2 = 1030
 y2 = 585
 
+# Maping
+def Maping(x,y):
+    if (y==585 and (x==940 or x==720 or x==500 or x==280 or x==920 or x==700 or x==480 or x==260)) or (y==95 and(x==280 or x==390 or x==500 or x==830 or x==1050 or x==260 or x==370 or x==480 or x==810 or x==1030)):
+        onFeeling1('NounsMissionsFeelings.db')
+    elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
+        onFeeling1('NounsMissionsFeelings.db')
 # Fonts initialisation
 font = pygame.font.Font(None, 25)
 verysmallfont = pygame.font.SysFont("comicsansms", 15)
@@ -940,31 +946,32 @@ def gameloop():
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y1 >= 120 and x1 <= 267):  # Conditions for moving the marbles..
-                                y1 -= 85
-                            elif (y1 < 120 and x1 < 1015 and x1 >= 267):
-                                x1 += 125
-                            elif (y1 > 110 and x1 > 1015 and y1 < 500):
-                                y1 += 85
-                            elif (y1 > 500 and x1 < 1040 and x1 >= 267):
-                                x1 -= 125
-                        print
-                        amountp1()
+                            if (y1 == 585 and x1 <= 1050 and x1 > 280):
+                                x1 -= 110
+                            elif (x1 == 280 and y1 <= 585 and y1 > 95):
+                                y1 -= 70
+                            elif (y1 == 95 and x1 >= 280 and x1 < 1050):
+                                x1 += 110
+                            elif (x1 == 1050 and y1 >= 95 and y1 < 585):
+                                y1 += 70
+
+                            # print
+                            # amountp1()
                     else:  # Same for other player
-                        for i in range(dice()):
+                         for i in range(dice()):
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y2 >= 150 and x2 <= 267):
-                                y2 -= 85
-                            elif (y2 < 150 and x2 < 1015 and x2 >= 267):
-                                x2 += 125
-                            elif (y2 > 140 and x2 > 1015 and y2 < 500):
-                                y2 += 85
-                            elif (y2 > 500 and x2 < 1040 and x2 >= 267):
-                                x2 -= 125
-                        print
-                        amountp2()
+                            if (y2 == 585 and x2 <= 1030 and x2 > 260):
+                                x2 -= 110
+                            elif (x2 == 260 and y2 <= 585 and y2 > 95):
+                                 y2 -= 70
+                            elif (y2 == 95 and x2 >= 260 and x2 < 1030):
+                                 x2 += 110
+                            elif (x2 == 1030 and y2 >= 95 and y2 < 585):
+                                y2 += 70
+                        #print
+                        #amountp2()
             elif event.type == pygame.MOUSEBUTTONUP:
                 pass
             if (initial_cost1 <= 0 or initial_cost2 <= 0):  # THe winning condition

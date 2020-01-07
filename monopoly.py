@@ -90,6 +90,11 @@ def Maping(x,y):
         onFeeling1('NounsMissionsFeelings.db')
     elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
         onFeeling1('NounsMissionsFeelings.db')
+    elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
+        return
+    elif (y==585 and(x==610 or x==590)) or (y==95 and(x==940 or x==920)) or ((x==280 or x==260)and(y==445 or y==305 or y==165)) or ((x==1050 or x==1030)and(y==445 or y == 375 or y==165)):
+        onMission1('NounsMissionsFeelings.db')
+
 # Fonts initialisation
 font = pygame.font.Font(None, 25)
 verysmallfont = pygame.font.SysFont("comicsansms", 15)
@@ -133,18 +138,17 @@ initial_cost1 = 5  # number of nouns
 
 def onFeeling1(db_file):
     conn = sqlite3.connect(db_file)
-    assert(conn!=None)
+    assert (conn != None)
     cur = conn.cursor()
     cur.execute("SELECT * FROM FEELINGS")
     rows = cur.fetchall()
     feelingRow = random.choice(rows)
     feeling = feelingRow[1]
     display_surface = pygame.display.set_mode((200, 200))
-    text = font.render("feeling:    " + feeling, True, black, white)
+    text = font.render("feeling:    " + feeling, True, black, white)
     textRect = text.get_rect()
     textRect.center = (100, 100)
-    flag = True
-    while flag:
+    for i in range(0, 1):
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
@@ -152,8 +156,11 @@ def onFeeling1(db_file):
                 pygame.quit()
                 quit()
 
-                # Draws the surface object to the screen.
+    # Draws the surface object to the screen.
             pygame.display.update()
+        time.sleep(1)
+    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
+    gameloop()
 
 def fiveNounsStart(db_file):
     nouns=[]
@@ -954,7 +961,7 @@ def gameloop():
                                 x1 += 110
                             elif (x1 == 1050 and y1 >= 95 and y1 < 585):
                                 y1 += 70
-
+                        Maping(x1,y1)
                             # print
                             # amountp1()
                     else:  # Same for other player
@@ -970,6 +977,7 @@ def gameloop():
                                  x2 += 110
                             elif (x2 == 1030 and y2 >= 95 and y2 < 585):
                                 y2 += 70
+                         Maping(x2, y2)
                         #print
                         #amountp2()
             elif event.type == pygame.MOUSEBUTTONUP:

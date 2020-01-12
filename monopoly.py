@@ -83,26 +83,6 @@ x1 = 1050
 y1 = 585
 x2 = 1030
 y2 = 585
-yCards1=300
-yCards2=300
-xCard1 = 70
-xCard2 = 1170
-isFinishedRound1 = False
-isFinishedRound2 = False
-
-# Maping
-def Maping(x,y):
-
-    if (y==585 and (x==940 or x==720 or x==500 or x==280 or x==920 or x==700 or x==480 or x==260)) or (y==95 and(x==280 or x==390 or x==500 or x==830 or x==1050 or x==260 or x==370 or x==480 or x==810 or x==1030)):
-        onFeeling1('NounsMissionsFeelings.db')
-    elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
-        onFeeling1('NounsMissionsFeelings.db')
-    elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
-        return
-    elif (y==585 and(x==610 or x==590)) or (y==95 and(x==940 or x==920)) or ((x==280 or x==260)and(y==445 or y==305 or y==165)) or ((x==1050 or x==1030)and(y==445 or y == 375 or y==165)):
-        onMission1('NounsMissionsFeelings.db')
-
-
 
 # Fonts initialisation
 font = pygame.font.Font(None, 25)
@@ -147,17 +127,18 @@ initial_cost1 = 5  # number of nouns
 
 def onFeeling1(db_file):
     conn = sqlite3.connect(db_file)
-    assert (conn != None)
+    assert(conn!=None)
     cur = conn.cursor()
     cur.execute("SELECT * FROM FEELINGS")
     rows = cur.fetchall()
     feelingRow = random.choice(rows)
     feeling = feelingRow[1]
     display_surface = pygame.display.set_mode((200, 200))
-    text = font.render("feeling:    " + feeling, True, black, white)
+    text = font.render("feeling:    " + feeling, True, black, white)
     textRect = text.get_rect()
     textRect.center = (100, 100)
-    for i in range(0, 1):
+    flag = True
+    while flag:
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
@@ -165,32 +146,8 @@ def onFeeling1(db_file):
                 pygame.quit()
                 quit()
 
-    # Draws the surface object to the screen.
+                # Draws the surface object to the screen.
             pygame.display.update()
-        time.sleep(1)
-    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
-    gameloop()
-
-def addTowNouns(db_file,nounOfPlayer,x,y): # add tow card from the pack to the player
-    for i in range(2):
-        conn = sqlite3.connect(db_file)
-        assert (conn != None)
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM NOUNS")
-        rows = cur.fetchall()
-        nounRow = random.choice(rows)
-        nounOfPlayer.append(nounRow[1])
-        drawCards(nounRow[1], x, y)
-
-def drawCards(nounsOfPlayer,x,y):
-
-    all_rects = []
-    rect = Rect(nounsOfPlayer, white, x, y)
-    all_rects.append(rect)
-    rect.Draw()
-    nounText = font.render(nounsOfPlayer, 1, black)
-    gamedisplay.blit(nounText, [x, y])
-    y += 60
 
 def fiveNounsStart(db_file):
     nouns=[]
@@ -215,7 +172,7 @@ def passwordsAdmin(db_file):
 
 def passwordsOb(db_file):
     conn = sqlite3.connect(db_file)
-    assert(conn!=None)
+    assert(conn!=NotADirectoryError)
     cur = conn.cursor()
     cur.execute("SELECT distinct Guider_Password FROM GUIDERS")
     rows = cur.fetchall()
@@ -482,10 +439,36 @@ def login(user):
             pwds = passwordsOb('USERS.db')
             for i in range(len(pwds)):
                 if (text == pwds[i][0]):
+                    print("something missing")
                     ob_screen()
 
 def ob_screen():
-    print ("ob_screen")
+
+    print("ob_screen")
+
+    pygame.mixer.music.stop()
+    cur = (0, 0)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cur = pygame.mouse.get_pos()
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        # using the defined text_to_button function in order to produce text to the screen
+        button("Nouns", 600, 190, 100, 40, white, lightyellow, action="nouns")
+        button("Feelings", 600, 250, 100, 40, white, lightyellow, action="feelings")
+        button("Missions", 600, 310, 100, 40, white, lightyellow, action="missions")
+        button("Players", 600, 370, 100, 40, white, lightyellow, action="players")
+        button("Tokens", 600, 430, 100, 40, white, lightyellow, action="tokens")
+        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
+        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+
 
 def admin_screen():
     pygame.mixer.music.stop()
@@ -564,7 +547,9 @@ def wordsAdmin(db_file,com,str1,str2):
         for i in rows:
             all_nouns.append(i[0])
         for noun in all_nouns:
+
             text_to_button2(noun, black, x, y, 50, 10)
+
             y += 40
             if (y>500):
                 x = x+220
@@ -579,6 +564,80 @@ def wordsAdmin(db_file,com,str1,str2):
         button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
+
+#observer
+"""""
+def wordsObserver(db_file,com,str1,str2):
+    input_box = pygame.Rect(600, 600, 140, 32)
+    color_inactive = pygame.Color('blue')
+    color_active = pygame.Color('black')
+    color = color_inactive
+    active = False
+    text = ''
+    word=''
+    gcont = True
+    pygame.mixer.music.stop()
+    while gcont:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_box.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    active = not active
+                else:
+                    active = False
+            color = color_active if active else color_inactive
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if event.key == pygame.K_BACKSPACE:
+                        text = text[:-1]
+                    elif (event.key!=pygame.K_RETURN):
+                        text += event.unicode
+                    else:
+                        word = text
+                        text=''
+        gamedisplay.fill(cream)
+        background = pygame.image.load('logo.jpg')
+        gamedisplay.blit(background, (450, 0))
+        txt_surface = font.render(text, True, color)
+        # Resize the box if the text is too long.
+        width = max(200, txt_surface.get_width() + 10)
+        input_box.w = width
+        # Blit the text.
+        gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        # Blit the input_box rect.
+        pygame.draw.rect(gamedisplay, color, input_box, 2)
+        conn = sqlite3.connect(db_file)
+        assert(conn!=None)
+        cur = conn.cursor()
+        cur.execute(com)
+        rows = cur.fetchall()
+        all_nouns=[]
+        x, y = 400, 180
+        for i in rows:
+            all_nouns.append(i[0])
+        for noun in all_nouns:
+            text_to_button2(noun, black, x, y, 50, 10)
+            button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+            y += 40
+            if (y>500):
+                x = x+220
+                y=180
+        if word in all_nouns:
+            cur.execute(str1 + word + "'")
+            word=''
+        else:
+            cur.execute(str2+word+"')")
+            word=''
+        conn.commit()
+        button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        pygame.display.update()
+        """""
+
 
 def playersAdmin(db_file):
     input_boxName = pygame.Rect(600, 550, 140, 32)
@@ -668,6 +727,7 @@ def playersAdmin(db_file):
         for j in rowsAges:
             all_ages.append(j[0])
         for name in all_names:
+            print(all_names)
             text_to_button2(name, black, x, y, 50, 10)
             y += 40
             if (y>500):
@@ -821,7 +881,7 @@ def tokensAdmin(db_file):
         cur.execute("SELECT distinct Color_Name FROM TOKENS")
         rowsNames = cur.fetchall()
         cur.execute("SELECT RED FROM TOKENS")
-        rowsRed = cur.fetchall()
+        rowsRed = cur.ftchall()
         cur.execute("SELECT GREEN FROM TOKENS")
         rowsGreen = cur.fetchall()
         cur.execute("SELECT BLUE FROM TOKENS")
@@ -962,15 +1022,12 @@ global nouns1
 global nouns2
 nouns1 =  fiveNounsStart('NounsMissionsFeelings.db')
 nouns2 =  fiveNounsStart('NounsMissionsFeelings.db')
-
 # The main function responsible for the game-play.Everything after clicking the play button is hard-coded in the given fubction
 def gameloop():
     global x1
     global y1
     global x2
     global y2
-    global isFinishedRound1
-    global isFinishedRound2
     pygame.mixer.music.stop()
     gloop = True
     while gloop:
@@ -986,41 +1043,31 @@ def gameloop():
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y1 == 585 and x1 <= 1050 and x1 > 280):
-                                if (isFinishedRound1):
-                                    isFinishedRound1=False
-                                    addTowNouns('NounsMissionsFeelings.db', nouns1, xCard1, yCards1)
-                                x1 -= 110
-                            elif (x1 == 280 and y1 <= 585 and y1 > 95):
-                                y1 -= 70
-                            elif (y1 == 95 and x1 >= 280 and x1 < 1050):
-                                x1 += 110
-                            elif (x1 == 1050 and y1 >= 95 and y1 < 585):
-                                isFinishedRound1 = True
-                                y1 += 70
-                        Maping(x1,y1)
-                            # print
-                            # amountp1()
+                            if (y1 >= 120 and x1 <= 267):  # Conditions for moving the marbles..
+                                y1 -= 85
+                            elif (y1 < 120 and x1 < 1015 and x1 >= 267):
+                                x1 += 125
+                            elif (y1 > 110 and x1 > 1015 and y1 < 500):
+                                y1 += 85
+                            elif (y1 > 500 and x1 < 1040 and x1 >= 267):
+                                x1 -= 125
+                        print
+                        amountp1()
                     else:  # Same for other player
-                         for i in range(dice()):
+                        for i in range(dice()):
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y2 == 585 and x2 <= 1030 and x2 > 260):
-                                if(isFinishedRound2):
-                                    isFinishedRound2=False
-                                    addTowNouns('NounsMissionsFeelings.db', nouns2, xCard2, yCards2)
-                                x2 -= 110
-                            elif (x2 == 260 and y2 <= 585 and y2 > 95):
-                                 y2 -= 70
-                            elif (y2 == 95 and x2 >= 260 and x2 < 1030):
-                                 x2 += 110
-                            elif (x2 == 1030 and y2 >= 95 and y2 < 585):
-                                isFinishedRound2=True
-                                y2 += 70
-                         Maping(x2, y2)
-                        #print
-                        #amountp2()
+                            if (y2 >= 150 and x2 <= 267):
+                                y2 -= 85
+                            elif (y2 < 150 and x2 < 1015 and x2 >= 267):
+                                x2 += 125
+                            elif (y2 > 140 and x2 > 1015 and y2 < 500):
+                                y2 += 85
+                            elif (y2 > 500 and x2 < 1040 and x2 >= 267):
+                                x2 -= 125
+                        print
+                        amountp2()
             elif event.type == pygame.MOUSEBUTTONUP:
                 pass
             if (initial_cost1 <= 0 or initial_cost2 <= 0):  # THe winning condition
@@ -1033,13 +1080,13 @@ def gameloop():
         background1 = pygame.image.load('board1.jpg')
         gamedisplay.blit(background1, (220, 50))
         button("ROLL THE DICE", 565, 650, 200, 40, darkblue, green, action="roll")
-        button("Quit", 130, 650, 200, 40, red, white, action="quit")
+
         pygame.draw.circle(gamedisplay, firstrgb, [x1, y1],10)  # Cordinates are in form of variables, for their movement!
         pygame.draw.circle(gamedisplay, secrgb, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
-        drawFive(nouns1,xCard1,yCards1)
-        drawFive(nouns2,xCard2,yCards2)
+        drawFive(nouns1,1170,300)
+        drawFive(nouns2,70,300)
         if (firstc=="red"):
             player1_heading = font.render("Player 1", 1, red)
         elif (firstc=="blue"):
@@ -1107,6 +1154,10 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 admin_screen()
             if action == "roll":
                 pygame.display.update()
+            """"
+            if action == "nounsOb"
+                
+            """
 
     else:
         pygame.draw.rect(gamedisplay, inactive_color, (x, y, width, height))

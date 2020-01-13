@@ -8,6 +8,7 @@ import sqlite3
 
 conn = sqlite3.connect('NounsMissionsFeelings.db')
 assert(conn!=None)
+print ("ASSERT1 OK")
 c = conn.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - NOUNS
@@ -26,6 +27,7 @@ conn.commit()
 
 conn1 = sqlite3.connect('Users.db')
 assert(conn1!=None)
+print ("ASSERT2 OK")
 c = conn1.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - PLAYERS
@@ -43,6 +45,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS GUIDERS
 conn1.commit()
 conn2 = sqlite3.connect('Tokens.db')
 assert(conn2!=None)
+print ("ASSERT3 OK")
 c = conn2.cursor()  # The database will be saved in the location where your 'py' file is saved
 
 # Create table - TOKENS
@@ -83,6 +86,26 @@ x1 = 1050
 y1 = 585
 x2 = 1030
 y2 = 585
+yCards1=300
+yCards2=300
+xCard1 = 70
+xCard2 = 1170
+isFinishedRound1 = False
+isFinishedRound2 = False
+
+# Maping
+def Maping(x,y):
+
+    if (y==585 and (x==940 or x==720 or x==500 or x==280 or x==920 or x==700 or x==480 or x==260)) or (y==95 and(x==280 or x==390 or x==500 or x==830 or x==1050 or x==260 or x==370 or x==480 or x==810 or x==1030)):
+        onFeeling1('NounsMissionsFeelings.db')
+    elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
+        onFeeling1('NounsMissionsFeelings.db')
+    elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
+        return
+    elif (y==585 and(x==610 or x==590)) or (y==95 and(x==940 or x==920)) or ((x==280 or x==260)and(y==445 or y==305 or y==165)) or ((x==1050 or x==1030)and(y==445 or y == 375 or y==165)):
+        onMission1('NounsMissionsFeelings.db')
+
+
 
 # Fonts initialisation
 font = pygame.font.Font(None, 25)
@@ -127,18 +150,18 @@ initial_cost1 = 5  # number of nouns
 
 def onFeeling1(db_file):
     conn = sqlite3.connect(db_file)
-    assert(conn!=None)
+    assert (conn != None)
+    print("ASSERT4 OK")
     cur = conn.cursor()
     cur.execute("SELECT * FROM FEELINGS")
     rows = cur.fetchall()
     feelingRow = random.choice(rows)
     feeling = feelingRow[1]
     display_surface = pygame.display.set_mode((200, 200))
-    text = font.render("feeling:    " + feeling, True, black, white)
+    text = font.render("feeling:    " + feeling, True, black, white)
     textRect = text.get_rect()
     textRect.center = (100, 100)
-    flag = True
-    while flag:
+    for i in range(0, 1):
         display_surface.fill(white)
         display_surface.blit(text, textRect)
         for event in pygame.event.get():
@@ -146,25 +169,53 @@ def onFeeling1(db_file):
                 pygame.quit()
                 quit()
 
-                # Draws the surface object to the screen.
+    # Draws the surface object to the screen.
             pygame.display.update()
+        time.sleep(1)
+    gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
+    gameloop()
+
+def addTowNouns(db_file,nounOfPlayer,x,y): # add tow card from the pack to the player
+    for i in range(2):
+        conn = sqlite3.connect(db_file)
+        assert (conn != None)
+        print("ASSERT5 OK")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM NOUNS")
+        rows = cur.fetchall()
+        nounRow = random.choice(rows)
+        nounOfPlayer.append(nounRow[1])
+        drawCards(nounRow[1], x, y)
+
+def drawCards(nounsOfPlayer,x,y):
+
+    all_rects = []
+    rect = Rect(nounsOfPlayer, white, x, y)
+    all_rects.append(rect)
+    rect.Draw()
+    nounText = font.render(nounsOfPlayer, 1, black)
+    gamedisplay.blit(nounText, [x, y])
+    y += 60
 
 def fiveNounsStart(db_file):
     nouns=[]
     for i in range(5):
         conn = sqlite3.connect(db_file)
         assert(conn!=None)
+        print("ASSERT6 OK")
         cur = conn.cursor()
         cur.execute("SELECT * FROM NOUNS")
         rows = cur.fetchall()
         nounRow = random.choice(rows)
         nouns.append(nounRow[1])
     assert (len(nouns) == 5)
+    print("ASSERT7 OK")
     return nouns
 
 def passwordsAdmin(db_file):
     conn = sqlite3.connect(db_file)
     assert(conn!=NotADirectoryError)
+    print("ASSERT8 OK")
     cur = conn.cursor()
     cur.execute("SELECT distinct Admin_Password FROM ADMINS")
     rows = cur.fetchall()
@@ -173,6 +224,7 @@ def passwordsAdmin(db_file):
 def passwordsOb(db_file):
     conn = sqlite3.connect(db_file)
     assert(conn!=None)
+    print("ASSERT9 OK")
     cur = conn.cursor()
     cur.execute("SELECT distinct Guider_Password FROM GUIDERS")
     rows = cur.fetchall()
@@ -193,6 +245,7 @@ def drawFive(nouns,x,y):
 def onMission1(db_file):
     conn = sqlite3.connect(db_file)
     assert(conn!=None)
+    print("ASSERT10 OK")
     cur = conn.cursor()
     cur.execute("SELECT * FROM MISSIONS")
     rows = cur.fetchall()
@@ -513,6 +566,7 @@ def wordsAdmin(db_file,com,str1,str2):
         pygame.draw.rect(gamedisplay, color, input_box, 2)
         conn = sqlite3.connect(db_file)
         assert(conn!=None)
+        print("ASSERT11 OK")
         cur = conn.cursor()
         cur.execute(com)
         rows = cur.fetchall()
@@ -609,6 +663,7 @@ def playersAdmin(db_file):
         pygame.draw.rect(gamedisplay, colorAge, input_boxAge, 2)
         conn = sqlite3.connect(db_file)
         assert(conn!=None)
+        print("ASSERT12 OK")
         cur = conn.cursor()
         cur.execute("SELECT distinct Player_Name FROM PLAYERS")
         rowsNames = cur.fetchall()
@@ -637,6 +692,7 @@ def playersAdmin(db_file):
                 xa = xa+270
                 ya=180
         assert(len(all_names)>0)
+        print("ASSERT13 OK")
         if word in all_names:
             cur.execute("DELETE FROM PLAYERS WHERE Player_Name='" + word + "' AND Player_Age="+str(age))
             conn.commit()
@@ -774,6 +830,7 @@ def tokensAdmin(db_file):
         pygame.draw.rect(gamedisplay, colorB, input_boxB, 2)
         conn = sqlite3.connect(db_file)
         assert(conn!=None)
+        print("ASSERT14 OK")
         cur = conn.cursor()
         cur.execute("SELECT distinct Color_Name FROM TOKENS")
         rowsNames = cur.fetchall()
@@ -806,6 +863,7 @@ def tokensAdmin(db_file):
                 x = x+220
                 y=180
         assert (len(all_red)!=0)
+        print("ASSERT15 OK")
         for dbrgb in range (len(all_red)):
             text_to_button2('('+str(all_red[dbrgb])+','+str(all_green[dbrgb])+','+str(all_blue[dbrgb])+')', black, xa, ya, 50, 10)
             ya += 40
@@ -865,6 +923,7 @@ def choose_color(db_file):
         # using the defined text_to_button function in order to produce text to the screen
         conn = sqlite3.connect(db_file)
         assert(conn!=None)
+        print("ASSERT16 OK")
         cur = conn.cursor()
         cur.execute("SELECT distinct Color_Name FROM TOKENS")
         rowsNames = cur.fetchall()
@@ -919,12 +978,15 @@ global nouns1
 global nouns2
 nouns1 =  fiveNounsStart('NounsMissionsFeelings.db')
 nouns2 =  fiveNounsStart('NounsMissionsFeelings.db')
+
 # The main function responsible for the game-play.Everything after clicking the play button is hard-coded in the given fubction
 def gameloop():
     global x1
     global y1
     global x2
     global y2
+    global isFinishedRound1
+    global isFinishedRound2
     pygame.mixer.music.stop()
     gloop = True
     while gloop:
@@ -940,31 +1002,41 @@ def gameloop():
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y1 >= 120 and x1 <= 267):  # Conditions for moving the marbles..
-                                y1 -= 85
-                            elif (y1 < 120 and x1 < 1015 and x1 >= 267):
-                                x1 += 125
-                            elif (y1 > 110 and x1 > 1015 and y1 < 500):
-                                y1 += 85
-                            elif (y1 > 500 and x1 < 1040 and x1 >= 267):
-                                x1 -= 125
-                        print
-                        amountp1()
+                            if (y1 == 585 and x1 <= 1050 and x1 > 280):
+                                if (isFinishedRound1):
+                                    isFinishedRound1=False
+                                    addTowNouns('NounsMissionsFeelings.db', nouns1, xCard1, yCards1)
+                                x1 -= 110
+                            elif (x1 == 280 and y1 <= 585 and y1 > 95):
+                                y1 -= 70
+                            elif (y1 == 95 and x1 >= 280 and x1 < 1050):
+                                x1 += 110
+                            elif (x1 == 1050 and y1 >= 95 and y1 < 585):
+                                isFinishedRound1 = True
+                                y1 += 70
+                        Maping(x1,y1)
+                            # print
+                            # amountp1()
                     else:  # Same for other player
-                        for i in range(dice()):
+                         for i in range(dice()):
                             pygame.mixer.music.stop()
                             pygame.mixer.music.load('dice.mp3')
                             pygame.mixer.music.play(0)
-                            if (y2 >= 150 and x2 <= 267):
-                                y2 -= 85
-                            elif (y2 < 150 and x2 < 1015 and x2 >= 267):
-                                x2 += 125
-                            elif (y2 > 140 and x2 > 1015 and y2 < 500):
-                                y2 += 85
-                            elif (y2 > 500 and x2 < 1040 and x2 >= 267):
-                                x2 -= 125
-                        print
-                        amountp2()
+                            if (y2 == 585 and x2 <= 1030 and x2 > 260):
+                                if(isFinishedRound2):
+                                    isFinishedRound2=False
+                                    addTowNouns('NounsMissionsFeelings.db', nouns2, xCard2, yCards2)
+                                x2 -= 110
+                            elif (x2 == 260 and y2 <= 585 and y2 > 95):
+                                 y2 -= 70
+                            elif (y2 == 95 and x2 >= 260 and x2 < 1030):
+                                 x2 += 110
+                            elif (x2 == 1030 and y2 >= 95 and y2 < 585):
+                                isFinishedRound2=True
+                                y2 += 70
+                         Maping(x2, y2)
+                        #print
+                        #amountp2()
             elif event.type == pygame.MOUSEBUTTONUP:
                 pass
             if (initial_cost1 <= 0 or initial_cost2 <= 0):  # THe winning condition
@@ -977,13 +1049,13 @@ def gameloop():
         background1 = pygame.image.load('board1.jpg')
         gamedisplay.blit(background1, (220, 50))
         button("ROLL THE DICE", 565, 650, 200, 40, darkblue, green, action="roll")
-
+        button("Quit", 130, 650, 200, 40, red, white, action="quit")
         pygame.draw.circle(gamedisplay, firstrgb, [x1, y1],10)  # Cordinates are in form of variables, for their movement!
         pygame.draw.circle(gamedisplay, secrgb, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
-        drawFive(nouns1,1170,300)
-        drawFive(nouns2,70,300)
+        drawFive(nouns1,xCard1,yCards1)
+        drawFive(nouns2,xCard2,yCards2)
         if (firstc=="red"):
             player1_heading = font.render("Player 1", 1, red)
         elif (firstc=="blue"):

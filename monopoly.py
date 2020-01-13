@@ -100,7 +100,7 @@ def Maping(x,y):
         onFeeling1('NounsMissionsFeelings.db')
     elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
         onFeeling1('NounsMissionsFeelings.db')
-    elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
+    elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95 and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
         return
     elif (y==585 and(x==610 or x==590)) or (y==95 and(x==940 or x==920)) or ((x==280 or x==260)and(y==445 or y==305 or y==165)) or ((x==1050 or x==1030)and(y==445 or y == 375 or y==165)):
         onMission1('NounsMissionsFeelings.db')

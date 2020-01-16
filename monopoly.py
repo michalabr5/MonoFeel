@@ -1167,7 +1167,7 @@ def text_to_button3(msg, color, buttonx, buttony, buttonwidth, buttonheight, siz
 # The very first function which runs as soon as the game starts
 def game_intro():
     time.sleep(0.2)
-    pygame.mixer.music.load('monofill.mp3')  # Sound in the background
+    pygame.mixer.music.load('playback.mp3')  # Sound in the background
     pygame.mixer.music.play(0)
     intro = True
     while intro:

@@ -83,12 +83,15 @@ x1 = 1050
 y1 = 585
 x2 = 1030
 y2 = 585
-yCards1=300
-yCards2=300
-xCard1 = 70
-xCard2 = 1170
+yCards1=160
+yCards2=160
+xCard1 = 20
+xCard2 = 1200
+all_rect1=[]
+all_rect2=[]
 isFinishedRound1 = False
 isFinishedRound2 = False
+isDelete=False
 
 # Maping
 def Maping(x,y):
@@ -98,7 +101,7 @@ def Maping(x,y):
     elif (x==280 and (y==515 or y==375 or y==235))or(x==260 and (y==515 or y==375 or y==235))or(x==1050 and (y==235 or y==515))or(x==1030 and (y==235 or y==515)):
         onFeeling1('NounsMissionsFeelings.db')
     elif (y==585 and(x==830 or x==390 or x==810 or x==370)) or(y==95and(x==610 or x==720 or x== 260 or x==700) or(y==305 and(x== 1050 or x==1030))):
-        return
+        isDelete=True
     elif (y==585 and(x==610 or x==590)) or (y==95 and(x==940 or x==920)) or ((x==280 or x==260)and(y==445 or y==305 or y==165)) or ((x==1050 or x==1030)and(y==445 or y == 375 or y==165)):
         onMission1('NounsMissionsFeelings.db')
 
@@ -171,7 +174,7 @@ def onFeeling1(db_file):
     gamedisplay = pygame.display.set_mode((display_width, display_height))  # Screen Dimension
     gameloop()
 
-def addTowNouns(db_file,nounOfPlayer,x,y): # add tow card from the pack to the player
+def addTowNouns(db_file,nounOfPlayer,x,y,all_rects): # add tow card from the pack to the player
     for i in range(2):
         conn = sqlite3.connect(db_file)
         assert (conn != None)
@@ -180,14 +183,10 @@ def addTowNouns(db_file,nounOfPlayer,x,y): # add tow card from the pack to the p
         rows = cur.fetchall()
         nounRow = random.choice(rows)
         nounOfPlayer.append(nounRow[1])
-        drawCards(nounRow[1], x, y)
+        drawCards(nounRow[1], x, y,all_rects)
 
-def drawCards(nounsOfPlayer,x,y):
-
-    all_rects = []
-    rect = Rect(nounsOfPlayer, white, x, y)
-    all_rects.append(rect)
-    rect.Draw()
+def drawCards(nounsOfPlayer,x,y,all_rects):
+    button("",x,y,50,50,white,lightgreen,action="Mark")
     nounText = font.render(nounsOfPlayer, 1, black)
     gamedisplay.blit(nounText, [x, y])
     y += 60
@@ -201,6 +200,8 @@ def fiveNounsStart(db_file):
         cur.execute("SELECT * FROM NOUNS")
         rows = cur.fetchall()
         nounRow = random.choice(rows)
+        while(nounRow[1]==''):
+            nounRow = random.choice(rows)
         nouns.append(nounRow[1])
     assert (len(nouns) == 5)
     return nouns
@@ -221,17 +222,17 @@ def passwordsOb(db_file):
     rows = cur.fetchall()
     return rows
 
-def drawFive(nouns,x,y):
-    all_rects = []
+def drawFive(nouns,x,y,all_rects):
+
     for noun in nouns:
-        rect=Rect(noun,white,x,y)
-        all_rects.append(rect)
-        rect.Draw()
+        button("", x, y, 50, 50, white, lightgreen,action="Mark")
         nounText = font.render(noun, 1, black)
         gamedisplay.blit(nounText, [x,y])
         y+=60
 
-
+def TakeOffNoune():
+    for rect in all_rects:
+        rect.rect.move(10,10)
 
 def onMission1(db_file):
     conn = sqlite3.connect(db_file)
@@ -974,6 +975,7 @@ def gameloop():
     pygame.mixer.music.stop()
     gloop = True
     while gloop:
+        print(pygame.mouse.get_pos())
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -989,7 +991,7 @@ def gameloop():
                             if (y1 == 585 and x1 <= 1050 and x1 > 280):
                                 if (isFinishedRound1):
                                     isFinishedRound1=False
-                                    addTowNouns('NounsMissionsFeelings.db', nouns1, xCard1, yCards1)
+                                    addTowNouns('NounsMissionsFeelings.db', nouns1, xCard1, yCards1,all_rect1)
                                 x1 -= 110
                             elif (x1 == 280 and y1 <= 585 and y1 > 95):
                                 y1 -= 70
@@ -1009,7 +1011,7 @@ def gameloop():
                             if (y2 == 585 and x2 <= 1030 and x2 > 260):
                                 if(isFinishedRound2):
                                     isFinishedRound2=False
-                                    addTowNouns('NounsMissionsFeelings.db', nouns2, xCard2, yCards2)
+                                    addTowNouns('NounsMissionsFeelings.db', nouns2, xCard2, yCards2,all_rect2)
                                 x2 -= 110
                             elif (x2 == 260 and y2 <= 585 and y2 > 95):
                                  y2 -= 70
@@ -1038,8 +1040,8 @@ def gameloop():
         pygame.draw.circle(gamedisplay, secrgb, [x2, y2], 10)  # Cordinates are in form of variables, for their movement!
 
         # printing all player related information on the screen
-        drawFive(nouns1,xCard1,yCards1)
-        drawFive(nouns2,xCard2,yCards2)
+        drawFive(nouns1,xCard1,yCards1,all_rect1)
+        drawFive(nouns2,xCard2,yCards2,all_rect2)
         if (firstc=="red"):
             player1_heading = font.render("Player 1", 1, red)
         elif (firstc=="blue"):
@@ -1049,8 +1051,8 @@ def gameloop():
         else:
             player1_heading = font.render("Player 1", 1, green)
         player1_subheading = font.render('Num Of Nouns:' + str(initial_cost1), 1, black)
-        gamedisplay.blit(player1_heading, [70, 186])
-        gamedisplay.blit(player1_subheading, [40, 220])
+        gamedisplay.blit(player1_heading, [40, 100])
+        gamedisplay.blit(player1_subheading, [10, 130])
         if (secc == "red"):
             player2_heading = font.render("Player 2", 1, red)
         elif (secc == "blue"):
@@ -1060,8 +1062,8 @@ def gameloop():
         else:
             player2_heading = font.render("Player 2", 1, green)
         player1_subheading = font.render('Num Of Nouns:' + str(initial_cost2), 1, black)
-        gamedisplay.blit(player2_heading, [1165, 186])
-        gamedisplay.blit(player1_subheading, [1120, 220])
+        gamedisplay.blit(player2_heading, [1200, 100])
+        gamedisplay.blit(player1_subheading, [1155, 130])
         dicenumber = pygame.font.Font(None, 75)
         text1 = dicenumber.render(str(a), 1, black)
         gamedisplay.blit(text1, [642, 290])
@@ -1107,7 +1109,8 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 admin_screen()
             if action == "roll":
                 pygame.display.update()
-
+            if action == "Mark":
+                pygame.draw.rect(gamedisplay, inactive_color, (100, 100, width, height))
     else:
         pygame.draw.rect(gamedisplay, inactive_color, (x, y, width, height))
         text_to_button(text, black, x, y, width, height)

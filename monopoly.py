@@ -998,7 +998,7 @@ def gameloop():
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 cur = pygame.mouse.get_pos()
-                if ((765 > cur[0] > 50) and (690 > cur[1] > 10)):
+                if ((652 > cur[0] > 565) and (690> cur[1] > 650)):
                     if (alternate() == 0):  # condition for alternate turn using the 'alternate' function
                         for i in range(dice()):
                             pygame.mixer.music.stop()

@@ -1231,7 +1231,7 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 pygame.display.update()
             if action == "Mark":
                 pygame.draw.rect(gamedisplay, inactive_color, (100, 100, width, height))
-			if action == "Noun":
+            if action == "Noun":
                 selectwordsObserver('NounsMissionsFeelings.db', "SELECT distinct Feeling_Name FROM FEELINGS","DELETE FROM FEELINGS WHERE Feeling_Name='","INSERT INTO FEELINGS (Feeling_Name) VALUES ('")
 
              

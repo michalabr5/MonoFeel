@@ -421,6 +421,7 @@ def login(user):
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
         text_to_button2("PASSWORD: ", black, 480, 310, 10, 10)
+        #text_to_button2("from white to green", white,400,550,5,5)
         # Blit the text.
         gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         # Blit the input_box rect.
@@ -444,8 +445,6 @@ def login(user):
 
 def ob_screen():
 
-    print("ob_screen")
-
     pygame.mixer.music.stop()
     cur = (0, 0)
     while True:
@@ -459,14 +458,14 @@ def ob_screen():
         background = pygame.image.load('logo.jpg')
         gamedisplay.blit(background, (450, 0))
         # using the defined text_to_button function in order to produce text to the screen
-        button("Nouns", 600, 190, 100, 40, white, lightyellow, action="nouns")
-        button("Feelings", 600, 250, 100, 40, white, lightyellow, action="feelings")
-        button("Missions", 600, 310, 100, 40, white, lightyellow, action="missions")
-        button("Players", 600, 370, 100, 40, white, lightyellow, action="players")
-        button("Tokens", 600, 430, 100, 40, white, lightyellow, action="tokens")
-        button("back", 300, 600, 150, 40, darkblue, blue, action="back")
-        button("play", 600, 600, 150, 40, lightgreen, green, action="play")
-        button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
+        button("Nouns", 600, 190, 100, 40, white, lightyellow, action="Noun")
+        button("Feelings", 600, 250, 100, 40, white, lightyellow, action="feelingS")
+        button("Missions", 600, 310, 100, 40, white, lightyellow, action="missionS")
+        button("Players", 600, 370, 100, 40, white, lightyellow, action="playerS")
+        button("Tokens", 600, 430, 100, 40, white, lightyellow, action="tokenS")
+        button("back", 300, 600, 150, 40, darkblue, blue, action="bacK")
+
+
         pygame.display.update()
 
 
@@ -494,22 +493,24 @@ def admin_screen():
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
 
+#fill the small box with word in every button  and add it to the data base
 def wordsAdmin(db_file,com,str1,str2):
     input_box = pygame.Rect(600, 600, 140, 32)
-    color_inactive = pygame.Color('blue')
-    color_active = pygame.Color('black')
+    color_inactive = pygame.Color('black')
+    color_active = pygame.Color('blue')
     color = color_inactive
     active = False
     text = ''
     word=''
     gcont = True
     pygame.mixer.music.stop()
+
     while gcont:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if input_box.collidepoint(event.pos):
                     # Toggle the active variable.
@@ -526,6 +527,7 @@ def wordsAdmin(db_file,com,str1,str2):
                     else:
                         word = text
                         text=''
+
         gamedisplay.fill(cream)
         background = pygame.image.load('logo.jpg')
         gamedisplay.blit(background, (450, 0))
@@ -533,7 +535,7 @@ def wordsAdmin(db_file,com,str1,str2):
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
-        # Blit the text.
+        # Blit the text. (see it in the box what is writen )
         gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         # Blit the input_box rect.
         pygame.draw.rect(gamedisplay, color, input_box, 2)
@@ -544,45 +546,51 @@ def wordsAdmin(db_file,com,str1,str2):
         rows = cur.fetchall()
         all_nouns=[]
         x, y = 400, 180
+
+
         for i in rows:
             all_nouns.append(i[0])
         for noun in all_nouns:
-
             text_to_button2(noun, black, x, y, 50, 10)
-
+            # add to observer here the buttons with the word
             y += 40
             if (y>500):
                 x = x+220
                 y=180
+
+
+
         if word in all_nouns:
             cur.execute(str1 + word + "'")
-            word=''
+            word = ''
         else:
             cur.execute(str2+word+"')")
             word=''
         conn.commit()
+
         button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
 
 #observer
-"""""
-def wordsObserver(db_file,com,str1,str2):
+def selectwordsObserver(db_file,com,str1,str2):
+
     input_box = pygame.Rect(600, 600, 140, 32)
-    color_inactive = pygame.Color('blue')
-    color_active = pygame.Color('black')
+    color_inactive = pygame.Color('black')
+    color_active = pygame.Color('blue')
     color = color_inactive
     active = False
     text = ''
     word=''
     gcont = True
     pygame.mixer.music.stop()
+
     while gcont:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if input_box.collidepoint(event.pos):
                     # Toggle the active variable.
@@ -599,6 +607,7 @@ def wordsObserver(db_file,com,str1,str2):
                     else:
                         word = text
                         text=''
+
         gamedisplay.fill(cream)
         background = pygame.image.load('logo.jpg')
         gamedisplay.blit(background, (450, 0))
@@ -606,7 +615,7 @@ def wordsObserver(db_file,com,str1,str2):
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
-        # Blit the text.
+        # Blit the text. (see it in the box what is writen )
         gamedisplay.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         # Blit the input_box rect.
         pygame.draw.rect(gamedisplay, color, input_box, 2)
@@ -617,26 +626,34 @@ def wordsObserver(db_file,com,str1,str2):
         rows = cur.fetchall()
         all_nouns=[]
         x, y = 400, 180
+
+
         for i in rows:
             all_nouns.append(i[0])
         for noun in all_nouns:
-            text_to_button2(noun, black, x, y, 50, 10)
-            button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
+           # add to observer here the buttons with the word
             y += 40
             if (y>500):
                 x = x+220
                 y=180
+            button(noun, y, x, 50, 30, lightgreen, green, action="selectNoun")
+
         if word in all_nouns:
             cur.execute(str1 + word + "'")
-            word=''
+            word = ''
         else:
             cur.execute(str2+word+"')")
             word=''
         conn.commit()
+
+        #working on observer
+
+
+
         button("back", 300, 600, 150, 40, darkblue, blue, action="backAd")
         button("quit", 900, 600, 150, 40, lightgreen, green, action="quit")
         pygame.display.update()
-        """""
+
 
 
 def playersAdmin(db_file):
@@ -1154,10 +1171,24 @@ def button(text, x, y, width, height, inactive_color, active_color, action=None)
                 admin_screen()
             if action == "roll":
                 pygame.display.update()
-            """"
-            if action == "nounsOb"
-                
+
+            if action == "Noun":
+                selectwordsObserver('NounsMissionsFeelings.db', "SELECT distinct Feeling_Name FROM FEELINGS","DELETE FROM FEELINGS WHERE Feeling_Name='","INSERT INTO FEELINGS (Feeling_Name) VALUES ('")
+
+             
             """
+            if action == "feelingS":
+            
+            if action ==  "missionS":
+            
+            if action ==  "playerS":
+            
+            if action ==  "bacK":
+                ob_screen()
+            """
+
+
+
 
     else:
         pygame.draw.rect(gamedisplay, inactive_color, (x, y, width, height))
